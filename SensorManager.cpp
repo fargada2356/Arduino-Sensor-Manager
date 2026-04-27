@@ -1,7 +1,9 @@
 #include "SensorManager.h"
 
-SensorManager::SensorManager(uint8_t pin, uint8_t type, LiquidCrystal_I2C* lcdPtr, float voltage) : _dht(pin, type), _lcd(lcdPtr) {
+SensorManager::SensorManager(uint8_t pin, uint8_t type, LiquidCrystal_I2C* lcdPtr, float voltage, String user) : _dht(pin, type), _lcd(lcdPtr), _githubUser(user) {
 
+  _lcd = lcdPtr;
+  _githubUser = user;
   _pin = pin;
   _voltage = voltage;
 
@@ -21,16 +23,38 @@ void SensorManager::printInfo() {
 
 void SensorManager::updateDisplay() {
 
+  unsigned long currentMillis = millis();
+
+  // proverka dali e vreme za smqna na ekran
+  if (currentMillis - _lastModeSwap >= _swapInterval) {
+    _lastModeSwap = currentMillis;
+    _displayMode++;
+    if(_displayMode > 2) _displayMode = 0; // vrushtame nachalo
+    _lcd->clear(); // tuk e edinstvenoto mqsto, kudeto chistim, zashtoto smenqme celiqt kontekst
+  }
+
   _lcd->setCursor(0, 0);
-  _lcd->print("Temp: ");
-  _lcd->print(readTemperature());
-  _lcd->print("C    ");
-
+  if(_displayMode == 0) {
+  _lcd->print("----- TEMP -----");
   _lcd->setCursor(0, 1);
-  _lcd->print("Hum:  ");
+  _lcd->print("Value: ");
+  _lcd->print(readTemperature());
+  _lcd->print(" C");
+  }
+  else if (_displayMode == 1) {
+  _lcd->print("----- HUMID -----");
+  _lcd->setCursor(0, 1);
+  _lcd->print("Value: ");
   _lcd->print(_dht.readHumidity());
-  _lcd->print("%    ");
-
+  _lcd->print(" %");
+  }
+  else if(_displayMode == 2) {
+  _lcd->setCursor(0, 0);
+  _lcd->print("Dev: ");
+  _lcd->print(_githubUser);
+  _lcd->setCursor(0, 1);
+  _lcd->print("Status: Coding");
+  }
 }
 
 void SensorManager::begin() {

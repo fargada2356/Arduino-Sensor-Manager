@@ -4,11 +4,14 @@
 
 LiquidCrystal_I2C myLcd(0x27, 16, 2);
 
-SensorManager sensor(2, 11, &myLcd, 5.0);
+
+SensorManager sensor(2, 11, &myLcd, 5.0, "fargada2356-github");
 
 void setup() {
+  myLcd.init();
+  myLcd.backlight();
   Serial.begin(9600);
-  sensor.begin(); // izpolzvame "->" zashtoto e ukazatel
+  sensor.begin(); 
   sensor.printInfo();
 }
 
@@ -17,14 +20,13 @@ const long interval = 2000;
 
 
 void loop() {
+  sensor.updateDisplay();
   unsigned long currentMillis = millis();
-
   if(currentMillis - lastUpdate >= interval) {
     lastUpdate = currentMillis;
-  
-  sensor.updateDisplay();
-  
-  float t = sensor.readTemperature();
-  Serial.println(t);
+
+    float t = sensor.readTemperature();
+    Serial.println(t);
   }
+  
 }

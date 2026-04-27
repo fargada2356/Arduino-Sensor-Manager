@@ -1,0 +1,4 @@
+[wokwi]
+version = 1
+firmware = 'C:\Users\Dani\Documents\PlatformIO\Projects\Led\src'
+elf = 'C:\Users\Dani\Documents\PlatformIO\Projects\Led\src'
